@@ -70,6 +70,28 @@
             font-size: 14px;
         }
         
+        select {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            cursor: pointer;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        select option {
+            padding: 10px;
+        }
+        
         input[type="text"],
         input[type="date"] {
             width: 100%;
@@ -182,8 +204,17 @@
         
         <form id="bookingForm">
             <div class="form-group">
-                <label for="name">Your Name</label>
-                <input type="text" id="name" name="name" required placeholder="Enter your full name">
+                <label for="name">Select Player</label>
+                <select id="name" name="name" required>
+                    <option value="">Choose a player...</option>
+                    <option value="Shubham">Shubham</option>
+                    <option value="Shruti">Shruti</option>
+                    <option value="Annar Banar">Annar Banar</option>
+                    <option value="Ajgar">Ajgar</option>
+                    <option value="BFF">BFF</option>
+                    <option value="Rahul">Rahul</option>
+                    <option value="Nicky">Nicky</option>
+                </select>
             </div>
             
             <div class="form-group">
@@ -192,7 +223,7 @@
             </div>
             
             <button type="submit" class="submit-btn" id="submitBtn">
-                Book Court
+                Booked
             </button>
         </form>
         
@@ -211,22 +242,22 @@
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
 
-            const name = document.getElementById("name").value.trim();
+            const name = document.getElementById("name").value;
             const date = document.getElementById("date").value;
 
             if (!name || !date) {
-                showResponse("Please fill in all fields.", "error");
+                showResponse("Please select a player and date.", "error");
                 return;
             }
 
-            // Replace with your actual Google Apps Script Web App URL
+            // Replace with your NEW Google Apps Script Web App URL
             const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbygXWui9MKpZgF5o_QRwlpn0wHF8SW4zV1J69TYJx_4Wynu3s6ipfpPmEz4JhxQL3lo/exec";
             
             // Removed the URL check that was causing the error
 
             // Show loading state
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '<span class="spinner"></span>Booking...';
+                            submitBtn.innerHTML = '<span class="spinner"></span>Booking...';
             showResponse("Processing your booking...", "loading");
 
             try {
@@ -254,7 +285,7 @@
             } finally {
                 // Reset button state
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Book Court';
+                submitBtn.innerHTML = 'Booked';
             }
         });
 
