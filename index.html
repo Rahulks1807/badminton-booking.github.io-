@@ -206,15 +206,15 @@
             <div class="form-group">
                 <label for="name">Select Player</label>
                 <select id="name" name="name" required>
-                  <option value="">Choose a player...</option>
-                  <option value="Shubham">Shubham</option>
-                  <option value="Shruti">Shruti</option>
-                  <option value="Annar Banar">Annar Banar</option>
-                  <option value="Ajgar">Ajgar</option>
-                  <option value="BFF">BFF</option>
-                  <option value="Rahul">Rahul</option>
-                  <option value="Nicky">Nicky</option>
-                  <option value="Holiday_Man">Holiday_Man</option>
+                    <option value="">Choose a player...</option>
+                    <option value="Shubham">Shubham</option>
+                    <option value="Shruti">Shruti</option>
+                    <option value="Annar Banar">Annar Banar</option>
+                    <option value="Ajgar">Ajgar</option>
+                    <option value="BFF">BFF</option>
+                    <option value="Rahul">Rahul</option>
+                    <option value="Nicky">Nicky</option>
+                    <option value="Holiday_Man">Holiday_Man</option>
                 </select>
             </div>
             
@@ -224,13 +224,38 @@
             </div>
             
             <div class="form-group">
+                <label for="timeSlot">Time Slot</label>
+                <select id="timeSlot" name="timeSlot" required>
+                    <option value="">Select a time slot...</option>
+                    <option value="05:00-06:00">5:00 AM - 6:00 AM</option>
+                    <option value="06:00-07:00">6:00 AM - 7:00 AM</option>
+                    <option value="07:00-08:00">7:00 AM - 8:00 AM</option>
+                    <option value="08:00-09:00">8:00 AM - 9:00 AM</option>
+                    <option value="09:00-10:00">9:00 AM - 10:00 AM</option>
+                    <option value="10:00-11:00">10:00 AM - 11:00 AM</option>
+                    <option value="11:00-12:00">11:00 AM - 12:00 PM</option>
+                    <option value="12:00-13:00">12:00 PM - 1:00 PM</option>
+                    <option value="13:00-14:00">1:00 PM - 2:00 PM</option>
+                    <option value="14:00-15:00">2:00 PM - 3:00 PM</option>
+                    <option value="15:00-16:00">3:00 PM - 4:00 PM</option>
+                    <option value="16:00-17:00">4:00 PM - 5:00 PM</option>
+                    <option value="17:00-18:00">5:00 PM - 6:00 PM</option>
+                    <option value="18:00-19:00">6:00 PM - 7:00 PM</option>
+                    <option value="19:00-20:00">7:00 PM - 8:00 PM</option>
+                    <option value="20:00-21:00">8:00 PM - 9:00 PM</option>
+                    <option value="21:00-22:00">9:00 PM - 10:00 PM</option>
+                    <option value="22:00-23:00">10:00 PM - 11:00 PM</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
                 <label for="status">Booking Status</label>
                 <select id="status" name="status" required>
-                  <option value="">Select status...</option>
-                  <option value="Booked">Booked</option>
-                  <option value="Not Booked">Not Booked</option>
-                  <option value="Holiday">Holiday</option>
-                  <option value="Pending with Issues">Pending with Issues</option>
+                    <option value="">Select status...</option>
+                    <option value="Booked">Booked</option>
+                    <option value="Not Booked">Not Booked</option>
+                    <option value="Holiday">Holiday</option>
+                    <option value="Pending with Issues">Pending with Issues</option>
                 </select>
             </div>
             
@@ -263,8 +288,8 @@
                 return;
             }
 
-            // Replace with your NEW Google Apps Script Web App URL
-            const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzhIc3cFHIsz3pzOlQxqcahZTrGp26NmitgOHNvyJj5gPQ089TfNl5rmrxyUB_YowDp/exec";
+            // IMPORTANT: Replace with your ACTUAL Google Apps Script Web App URL
+            const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzE5QMzUSHQ5_l54znYgqG4T0ZDn3OaiiPGlBnCk762D87giJvXKOstc9u2DSsm_SvZ/exec";
             
             // Removed the URL check that was causing the error
 
