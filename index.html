@@ -224,6 +224,16 @@
             </div>
             
             <div class="form-group">
+                <label for="venue">Venue</label>
+                <select id="venue" name="venue" required>
+                    <option value="">Select a venue...</option>
+                    <option value="Gaur City 1">Gaur City 1</option>
+                    <option value="Sedra">Sedra</option>
+                    <option value="Others">Others</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
                 <label for="timeSlot">Time Slot</label>
                 <select id="timeSlot" name="timeSlot" required>
                     <option value="">Select a time slot...</option>
@@ -281,16 +291,17 @@
 
             const name = document.getElementById("name").value;
             const date = document.getElementById("date").value;
+            const venue = document.getElementById("venue").value;
             const timeSlot = document.getElementById("timeSlot").value;
             const status = document.getElementById("status").value;
 
-            if (!name || !date || !timeSlot || !status) {
-                showResponse("Please select a player, date, time slot, and status.", "error");
+            if (!name || !date || !venue || !timeSlot || !status) {
+                showResponse("Please select a player, date, venue, time slot, and status.", "error");
                 return;
             }
 
             // Your Google Apps Script Web App URL
-            const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby_zLwJ6VNYrkTKCeybOdgz8ZoTGyDIJ2-GkKtoqn9BB_1e1lRK32B8BM1tsFOJeVy2/exec";
+            const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxltPSAYuDwNpDQM1M4qx4OZ36QXLa0ubQIIwzeQg3fFbQS-1lA0ne0WAmQ0AC-8BkK/exec";
 
             // Show loading state
             submitBtn.disabled = true;
@@ -298,7 +309,7 @@
             showResponse("Processing your booking and checking for time slot conflicts...", "loading");
 
             try {
-                console.log('Sending booking data:', { name, date, timeSlot, status });
+                console.log('Sending booking data:', { name, date, venue, timeSlot, status });
                 console.log('Using URL:', GAS_WEB_APP_URL);
                 
                 // Use no-cors mode for GitHub Pages to Google Apps Script
@@ -308,11 +319,11 @@
                     headers: {
                         "Content-Type": "text/plain",
                     },
-                    body: JSON.stringify({ name, date, timeSlot, status }),
+                    body: JSON.stringify({ name, date, venue, timeSlot, status }),
                 });
 
                 console.log('Request sent successfully');
-                showResponse(`✅ Booking submitted! ${name} - ${status} for ${formatDate(date)} at ${timeSlot}. Please check the spreadsheet to confirm.`, "success");
+                showResponse(`✅ Booking submitted! ${name} - ${status} for ${formatDate(date)} at ${venue} (${timeSlot}). Please check the spreadsheet to confirm.`, "success");
                 form.reset();
                 
             } catch (error) {
