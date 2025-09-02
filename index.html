@@ -214,6 +214,7 @@
                     <option value="BFF">BFF</option>
                     <option value="Rahul">Rahul</option>
                     <option value="Nicky">Nicky</option>
+                    <option value="Holiday_Man">Holiday_Man</option>
                 </select>
             </div>
             
@@ -222,8 +223,18 @@
                 <input type="date" id="date" name="date" required>
             </div>
             
+            <div class="form-group">
+                <label for="status">Booking Status</label>
+                <select id="status" name="status" required>
+                    <option value="">Select status...</option>
+                    <option value="Booked">Booked</option>
+                    <option value="Not Booked">Not Booked</option>
+                    <option value="Pending with Issues">Pending with Issues</option>
+                </select>
+            </div>
+            
             <button type="submit" class="submit-btn" id="submitBtn">
-                Booked
+                Submit
             </button>
         </form>
         
@@ -244,14 +255,15 @@
 
             const name = document.getElementById("name").value;
             const date = document.getElementById("date").value;
+            const status = document.getElementById("status").value;
 
-            if (!name || !date) {
-                showResponse("Please select a player and date.", "error");
+            if (!name || !date || !status) {
+                showResponse("Please select a player, date, and status.", "error");
                 return;
             }
 
             // Replace with your NEW Google Apps Script Web App URL
-            const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx35i4CfIXWgtTnfnxfCIBkDRvHtckpoDAfOwBaJlz1d5iMVwS-02uXjXDl4U4HMS3Z/exec";
+            const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxm041kct143Yr0THRk52P4b63uwcVw562QPXvdID0uuAGGc1Gu5A8hkTeG8xD2C2SD/exec";
             
             // Removed the URL check that was causing the error
 
@@ -261,7 +273,7 @@
             showResponse("Processing your booking...", "loading");
 
             try {
-                console.log('Sending booking data:', { name, date });
+                console.log('Sending booking data:', { name, date, status });
                 console.log('Using URL:', GAS_WEB_APP_URL);
                 
                 // For GitHub Pages, we need to use no-cors mode
@@ -271,12 +283,12 @@
                     headers: {
                         "Content-Type": "text/plain", // Change to text/plain for no-cors
                     },
-                    body: JSON.stringify({ name, date }),
+                    body: JSON.stringify({ name, date, status }),
                 });
 
                 // With no-cors, we can't read the response, so we assume success
                 console.log('Request sent successfully');
-                showResponse(`✅ Booking submitted! ${name} booked for ${formatDate(date)}. Please check the spreadsheet to confirm.`, "success");
+                showResponse(`✅ Booking submitted! ${name} - ${status} for ${formatDate(date)}.`, "success");
                 form.reset();
                 
             } catch (error) {
@@ -285,7 +297,7 @@
             } finally {
                 // Reset button state
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Booked';
+                submitBtn.innerHTML = 'Submit Booking';
             }
         });
 
