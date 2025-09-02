@@ -230,23 +230,48 @@
             showResponse("Processing your booking...", "loading");
 
             try {
+                console.log('Sending data:', { name, date });
+                console.log('URL:', GAS_WEB_APP_URL);
+                
                 const response = await fetch(GAS_WEB_APP_URL, {
                     method: "POST",
-                    mode: "no-cors", // Required for Google Apps Script
                     headers: {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({ name, date }),
+                    mode: "cors" // Try CORS first
                 });
 
-                // With no-cors mode, we can't read the response
-                // So we assume success if no network error occurred
-                showResponse(`✅ Booking successful! ${name} has been booked for ${formatDate(date)}.`, "success");
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Response:', result);
+                    showResponse(`✅ ${result.message || 'Booking successful!'} ${name} booked for ${formatDate(date)}.`, "success");
+                } else {
+                    console.error('HTTP Error:', response.status);
+                    showResponse(`❌ Booking failed (HTTP ${response.status}). Please try again.`, "error");
+                }
                 form.reset();
                 
             } catch (error) {
-                console.error("Error:", error);
-                showResponse("❌ Booking failed. Please check your internet connection and try again.", "error");
+                console.error("Fetch Error:", error);
+                
+                // Fallback to no-cors mode
+                try {
+                    await fetch(GAS_WEB_APP_URL, {
+                        method: "POST",
+                        mode: "no-cors",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ name, date }),
+                    });
+                    
+                    showResponse(`✅ Booking submitted! ${name} booked for ${formatDate(date)}. (Please check the spreadsheet to confirm)`, "success");
+                    form.reset();
+                } catch (fallbackError) {
+                    console.error("Fallback Error:", fallbackError);
+                    showResponse("❌ Booking failed. Please check the console for details and try again.", "error");
+                }
             } finally {
                 // Reset button state
                 submitBtn.disabled = false;
