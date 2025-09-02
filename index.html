@@ -219,13 +219,10 @@
                 return;
             }
 
-            // Replace with your Google Apps Script Web App URL
+            // Replace with your actual Google Apps Script Web App URL
             const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzb3N4w3YqbH3vAJ2t8R1ii7lapnf4QE1VoJZCETfO1Vq6FLaFCnRhpmp0mWfyDsxbw/exec";
             
-            if (GAS_WEB_APP_URL === "https://script.google.com/macros/s/AKfycbzb3N4w3YqbH3vAJ2t8R1ii7lapnf4QE1VoJZCETfO1Vq6FLaFCnRhpmp0mWfyDsxbw/exec") {
-                showResponse("Please configure the Google Apps Script URL first.", "error");
-                return;
-            }
+            // Removed the URL check that was causing the error
 
             // Show loading state
             submitBtn.disabled = true;
