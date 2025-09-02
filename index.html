@@ -288,8 +288,17 @@
                 return;
             }
 
-            // IMPORTANT: Replace with your ACTUAL Google Apps Script Web App URL
-            const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw2h6eYkLdj_4TAPujVOOl9wzvklON7ttqLR_dogrYyuRrnmHm0GQzRGvRbf36B2wQZ/exec";
+            // ⚠️ CRITICAL: Replace this with your ACTUAL Google Apps Script Web App URL
+            // Get the URL from: Apps Script → Deploy → Manage deployments → Copy URL
+            const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxB86Tsubxn-o96u6OXo3Imnbo8Z9mb0BvuUUaiIlHy6ckulPF0RM5kmpyMo7cbM0GF/exec";
+            
+            // Check if URL is still placeholder
+            if (GAS_WEB_APP_URL.includes("YOUR_ACTUAL_DEPLOYMENT_ID_HERE")) {
+                showResponse("❌ Please update the Google Apps Script URL in the code before testing.", "error");
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Submit Booking';
+                return;
+            }
             
             // Removed the URL check that was causing the error
 
