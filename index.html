@@ -207,14 +207,14 @@
                 <label for="name">Select Player</label>
                 <select id="name" name="name" required>
                     <option value="">Choose a player...</option>
+                    <option value="Shubham">Shubham</option>
+                    <option value="Shruti">Shruti</option>
+                    <option value="Annar Banar">Annar Banar</option>
+                    <option value="Ajgar">Ajgar</option>
+                    <option value="BFF">BFF</option>
                     <option value="Rahul">Rahul</option>
-                    <option value="Priya">Priya</option>
-                    <option value="Amit">Amit</option>
-                    <option value="Sneha">Sneha</option>
-                    <option value="Vikram">Vikram</option>
-                    <option value="Anita">Anita</option>
-                    <option value="Rohit">Rohit</option>
-                    <option value="Kavya">Kavya</option>
+                    <option value="Nicky">Nicky</option>
+                    <option value="Holiday_Man">Holiday_Man</option>
                 </select>
             </div>
             
@@ -254,6 +254,7 @@
                     <option value="">Select status...</option>
                     <option value="Booked">Booked</option>
                     <option value="Not Booked">Not Booked</option>
+                    <option value="Holiday">Holiday</option>
                     <option value="Pending with Issues">Pending with Issues</option>
                 </select>
             </div>
@@ -288,42 +289,30 @@
                 return;
             }
 
-            // ⚠️ CRITICAL: Replace this with your ACTUAL Google Apps Script Web App URL
-            // Example: "https://script.google.com/macros/s/AKfycbzXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX/exec"
-            const GAS_WEB_APP_URL = "PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE";
-            
-            // Check if URL is still placeholder
-            if (GAS_WEB_APP_URL === "PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE" || GAS_WEB_APP_URL.includes("YOUR_ACTUAL_DEPLOYMENT_ID_HERE")) {
-                showResponse("❌ Please update the Google Apps Script URL in the code before testing.", "error");
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Submit Booking';
-                return;
-            }
-            
-            // Removed the URL check that was causing the error
+            // Your Google Apps Script Web App URL
+            const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby_zLwJ6VNYrkTKCeybOdgz8ZoTGyDIJ2-GkKtoqn9BB_1e1lRK32B8BM1tsFOJeVy2/exec";
 
             // Show loading state
             submitBtn.disabled = true;
-                            submitBtn.innerHTML = '<span class="spinner"></span>Booking...';
-            showResponse("Processing your booking...", "loading");
+            submitBtn.innerHTML = '<span class="spinner"></span>Submitting...';
+            showResponse("Processing your booking and checking for time slot conflicts...", "loading");
 
             try {
                 console.log('Sending booking data:', { name, date, timeSlot, status });
                 console.log('Using URL:', GAS_WEB_APP_URL);
                 
-                // For GitHub Pages, we need to use no-cors mode
+                // Use no-cors mode for GitHub Pages to Google Apps Script
                 await fetch(GAS_WEB_APP_URL, {
                     method: "POST",
-                    mode: "no-cors", // Required for GitHub Pages to Google Apps Script
+                    mode: "no-cors",
                     headers: {
-                        "Content-Type": "text/plain", // Change to text/plain for no-cors
+                        "Content-Type": "text/plain",
                     },
                     body: JSON.stringify({ name, date, timeSlot, status }),
                 });
 
-                // With no-cors, we can't read the response, so we assume success
                 console.log('Request sent successfully');
-                showResponse(`✅ Booking submitted! ${name} - ${status} for ${formatDate(date)} at ${timeSlot}.`, "success");
+                showResponse(`✅ Booking submitted! ${name} - ${status} for ${formatDate(date)} at ${timeSlot}. Please check the spreadsheet to confirm.`, "success");
                 form.reset();
                 
             } catch (error) {
