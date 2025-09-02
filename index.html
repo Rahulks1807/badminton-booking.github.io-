@@ -220,7 +220,7 @@
             }
 
             // Replace with your actual Google Apps Script Web App URL
-            const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw2iWGpGZCVWR0SULPrQZKxCIFy3CD-d_MUz8bgdw_cbTADpwbxEECrYE-JDTa3Swwn/exec";
+            const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzepGc-I7BjS-xa7MyRZJKeIcQWxZdxks05_D7y3_fx4Ka-PpzGVnQqLsGN369SAYp2/exec";
             
             // Removed the URL check that was causing the error
 
@@ -230,8 +230,8 @@
             showResponse("Processing your booking...", "loading");
 
             try {
-                console.log('Sending data:', { name, date });
-                console.log('URL:', GAS_WEB_APP_URL);
+                console.log('Sending booking data:', { name, date });
+                console.log('Using URL:', GAS_WEB_APP_URL);
                 
                 const response = await fetch(GAS_WEB_APP_URL, {
                     method: "POST",
@@ -239,39 +239,39 @@
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({ name, date }),
-                    mode: "cors" // Try CORS first
                 });
 
+                console.log('Response status:', response.status);
+                console.log('Response ok:', response.ok);
+                
                 if (response.ok) {
-                    const result = await response.json();
-                    console.log('Response:', result);
-                    showResponse(`✅ ${result.message || 'Booking successful!'} ${name} booked for ${formatDate(date)}.`, "success");
+                    const result = await response.text(); // Get as text first
+                    console.log('Raw response:', result);
+                    
+                    try {
+                        const jsonResult = JSON.parse(result);
+                        console.log('Parsed response:', jsonResult);
+                        
+                        if (jsonResult.status === 'success') {
+                            showResponse(`✅ ${jsonResult.message} ${name} booked for ${formatDate(date)}.`, "success");
+                        } else {
+                            showResponse(`❌ ${jsonResult.message}`, "error");
+                        }
+                    } catch (parseError) {
+                        console.error('JSON parse error:', parseError);
+                        showResponse(`✅ Booking submitted successfully! ${name} booked for ${formatDate(date)}.`, "success");
+                    }
                 } else {
-                    console.error('HTTP Error:', response.status);
+                    const errorText = await response.text();
+                    console.error('HTTP Error:', response.status, errorText);
                     showResponse(`❌ Booking failed (HTTP ${response.status}). Please try again.`, "error");
                 }
+                
                 form.reset();
                 
             } catch (error) {
-                console.error("Fetch Error:", error);
-                
-                // Fallback to no-cors mode
-                try {
-                    await fetch(GAS_WEB_APP_URL, {
-                        method: "POST",
-                        mode: "no-cors",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({ name, date }),
-                    });
-                    
-                    showResponse(`✅ Booking submitted! ${name} booked for ${formatDate(date)}. (Please check the spreadsheet to confirm)`, "success");
-                    form.reset();
-                } catch (fallbackError) {
-                    console.error("Fallback Error:", fallbackError);
-                    showResponse("❌ Booking failed. Please check the console for details and try again.", "error");
-                }
+                console.error("Network Error:", error);
+                showResponse(`❌ Network error: ${error.message}. Please check your internet connection.`, "error");
             } finally {
                 // Reset button state
                 submitBtn.disabled = false;
