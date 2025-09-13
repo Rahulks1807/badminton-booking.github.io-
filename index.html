@@ -70,7 +70,7 @@
             font-size: 14px;
         }
         
-        select {
+        select, input[type="date"] {
             width: 100%;
             padding: 15px;
             border: 2px solid #e1e5e9;
@@ -81,39 +81,15 @@
             cursor: pointer;
         }
         
-        select:focus {
+        select:focus, input[type="date"]:focus {
             outline: none;
             border-color: #667eea;
             background: white;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
         
-        select option {
-            padding: 10px;
-        }
-        
-        input[type="text"],
-        input[type="date"] {
+        .btn {
             width: 100%;
-            padding: 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
-        }
-        
-        input[type="text"]:focus,
-        input[type="date"]:focus {
-            outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .submit-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 15px;
             border: none;
@@ -124,21 +100,26 @@
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         
         .submit-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
         }
-        
-        .submit-btn:active {
-            transform: translateY(0);
-        }
-        
+
         .submit-btn:disabled {
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
+        }
+
+        .get-schedule-btn {
+            background: #5a67d8;
         }
         
         #response {
@@ -177,21 +158,40 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
             margin-right: 10px;
+            vertical-align: middle;
         }
         
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
-        @media (max-width: 480px) {
-            .container {
-                padding: 30px 20px;
-            }
-            
-            .header h1 {
-                font-size: 24px;
-            }
+
+        #schedule-container {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e1e5e9;
+            display: none;
+        }
+
+        #schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        #schedule-table th, #schedule-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #schedule-table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        #schedule-table tr:hover {
+            background-color: #f1f1f1;
         }
     </style>
 </head>
@@ -269,18 +269,49 @@
                 </select>
             </div>
             
-            <button type="submit" class="submit-btn" id="submitBtn">
+            <button type="submit" class="btn submit-btn" id="submitBtn">
                 Submit Booking
             </button>
         </form>
         
         <div id="response"></div>
+
+        <button class="btn get-schedule-btn" id="getScheduleBtn">Get Schedule</button>
+
+        <div id="schedule-container">
+            <h2 style="text-align: center; margin-bottom: 20px;">Current Schedule</h2>
+            <div id="schedule-loader" style="text-align: center;">
+                <span class="spinner"></span> Loading Schedule...
+            </div>
+            <table id="schedule-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Venue</th>
+                        <th>Time</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="schedule-body">
+                    <!-- Schedule data will be inserted here -->
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <script>
         const form = document.getElementById("bookingForm");
         const responseDiv = document.getElementById("response");
         const submitBtn = document.getElementById("submitBtn");
+        const getScheduleBtn = document.getElementById("getScheduleBtn");
+        const scheduleContainer = document.getElementById("schedule-container");
+        const scheduleLoader = document.getElementById("schedule-loader");
+        const scheduleTable = document.getElementById("schedule-table");
+        const scheduleBody = document.getElementById("schedule-body");
+
+        // IMPORTANT: Replace this with your actual Google Apps Script Web App URL
+        const GAS_WEB_APP_URL = "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE";
 
         // Set minimum date to today
         const today = new Date().toISOString().split('T')[0];
@@ -288,75 +319,107 @@
 
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
-
-            const name = document.getElementById("name").value;
-            const date = document.getElementById("date").value;
-            const venue = document.getElementById("venue").value;
-            const timeSlot = document.getElementById("timeSlot").value;
-            const status = document.getElementById("status").value;
-
-            if (!name || !date || !venue || !timeSlot || !status) {
-                showResponse("Please select a player, date, venue, time slot, and status.", "error");
+            if (GAS_WEB_APP_URL === "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") {
+                showResponse("Configuration needed: Please add your Google Apps Script URL.", "error");
                 return;
             }
 
-            // Your Google Apps Script Web App URL
-            const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby4VmDW1mRmyKneYuFapcyBdE68bGl7rFMbpeSytTVz6kkqlg2YR9q8AVQEr1GpKIb5/exec";
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            if (!data.name || !data.date || !data.venue || !data.timeSlot || !data.status) {
+                showResponse("Please fill out all fields.", "error");
+                return;
+            }
 
-            // Show loading state
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<span class="spinner"></span>Submitting...';
-            showResponse("Processing your booking and checking for time slot conflicts...", "loading");
+            showResponse("Processing your booking...", "loading");
 
             try {
-                console.log('Sending booking data:', { name, date, venue, timeSlot, status });
-                console.log('Using URL:', GAS_WEB_APP_URL);
-                
-                // Use no-cors mode for GitHub Pages to Google Apps Script
-                await fetch(GAS_WEB_APP_URL, {
+                const response = await fetch(GAS_WEB_APP_URL, {
                     method: "POST",
-                    mode: "no-cors",
-                    headers: {
-                        "Content-Type": "text/plain",
-                    },
-                    body: JSON.stringify({ name, date, venue, timeSlot, status }),
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data),
                 });
-
-                console.log('Request sent successfully');
-                showResponse(`✅ Booking submitted! ${name} - ${status} for ${formatDate(date)} at ${venue} (${timeSlot}). Please check the spreadsheet to confirm.`, "success");
-                form.reset();
-                
+                const result = await response.json();
+                if (result.status === "success") {
+                    showResponse(`✅ Booking submitted successfully for ${data.name}!`, "success");
+                    form.reset();
+                } else {
+                    throw new Error(result.message || "An unknown error occurred.");
+                }
             } catch (error) {
-                console.error("Network Error:", error);
-                showResponse(`❌ Network error: ${error.message}. Please check your internet connection and try again.`, "error");
+                console.error("Submission Error:", error);
+                showResponse(`❌ Error: ${error.message}`, "error");
             } finally {
-                // Reset button state
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = 'Submit Booking';
             }
         });
+
+        getScheduleBtn.addEventListener("click", async () => {
+            if (GAS_WEB_APP_URL === "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") {
+                showResponse("Configuration needed: Please add your Google Apps Script URL.", "error");
+                return;
+            }
+            
+            scheduleContainer.style.display = 'block';
+            scheduleTable.style.display = 'none';
+            scheduleLoader.style.display = 'block';
+            getScheduleBtn.disabled = true;
+
+            try {
+                const response = await fetch(GAS_WEB_APP_URL);
+                const result = await response.json();
+
+                if (result.status === "success") {
+                    renderSchedule(result.data);
+                    scheduleTable.style.display = 'table';
+                } else {
+                    throw new Error(result.message || "Failed to fetch schedule.");
+                }
+            } catch (error) {
+                console.error("Fetch Schedule Error:", error);
+                scheduleBody.innerHTML = `<tr><td colspan="5" style="text-align:center; color: red;">Error: ${error.message}</td></tr>`;
+                scheduleTable.style.display = 'table';
+            } finally {
+                scheduleLoader.style.display = 'none';
+                getScheduleBtn.disabled = false;
+            }
+        });
+
+        function renderSchedule(data) {
+            scheduleBody.innerHTML = ""; // Clear existing data
+            if (data.length === 0) {
+                scheduleBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No bookings found.</td></tr>`;
+                return;
+            }
+            data.forEach(booking => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${booking.Name}</td>
+                    <td>${new Date(booking.Date).toLocaleDateString()}</td>
+                    <td>${booking.Venue}</td>
+                    <td>${booking.TimeSlot}</td>
+                    <td>${booking.Status}</td>
+                `;
+                scheduleBody.appendChild(row);
+            });
+        }
 
         function showResponse(message, type) {
             responseDiv.textContent = message;
             responseDiv.className = type;
             responseDiv.style.display = 'block';
             
-            // Auto-hide success messages after 5 seconds
-            if (type === 'success') {
+            if (type !== 'loading') {
                 setTimeout(() => {
-                    responseDiv.style.display = 'none';
+                    if (responseDiv.textContent === message) { // Hide only if message hasn't changed
+                        responseDiv.style.display = 'none';
+                    }
                 }, 5000);
             }
-        }
-
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            });
         }
     </script>
 </body>
